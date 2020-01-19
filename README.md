@@ -2,13 +2,13 @@
 
 EC2, S3 and Athena are used for this exercise. An EC2 instance is used to run the python script to download the dataset, convert the dataset into csv format and upload the converted dataset to a S3 bucket. A database and table are created in Athena to allow for query and data aggregation. The EC2 instance is optional. The python script can be run on an on-premise PC. 
 
-census_resources.yaml is the CloudFormation template used for the deployment. It creates the following resources:
+census_resources.yaml is the CloudFormation template used for the deployment. It creates the following resources,
 
-    * EC2 instance
-    * IAM user and IAM access key (for the python script to upload the dataset with AWS API)
-    * IAM policy (to allow the user access to the S3 bucket)
-    * S3 bucket
-    * Glue database and table
+  * EC2 instance
+  * IAM user and IAM access key (for the python script to upload the dataset with AWS API)
+  * IAM policy (to allow the user access to the S3 bucket)
+  * S3 bucket
+  * Glue database and table
     
 census_processor.py is a simple python script that does the download, convertion and upload. It is run after the resources are deployed via the CloudFormation template. 
 
