@@ -1,0 +1,166 @@
+Parameters:
+  CensusEC2InstanceType:
+    Type: String
+    Default: t2.micro
+  CensusEC2InstanceImage:
+    Type: String
+    Default: ami-0d542ef84ec55d71c
+  CensusEC2InstanceKey:
+    Type: String
+    Default: aws-exercise-key-pair
+  CensusUserPolicyName:
+    Type: String
+    Default: census-user-policy
+  CensusBucketName:
+    Type: String
+    Default: aws-exercise-jpmci
+  CensusDatabaseName:
+    Type: String
+    Default: censusdb
+  CensusTableName:
+    Type: String
+    Default: censusdb_migration
+
+Resources:
+  CensusEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref CensusEC2InstanceType
+      ImageId: !Ref CensusEC2InstanceImage
+      KeyName: !Ref CensusEC2InstanceKey
+
+  CensusUser:
+    Type: AWS::IAM::User
+
+  CensusUserPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Ref CensusUserPolicyName
+      PolicyDocument:
+        Statement:
+        - Effect: Allow
+          Action: ['s3:*']
+          Resource: '*'
+      Users: [!Ref CensusUser]
+
+  CensusUserKey:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref CensusUser
+
+  CensusBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref CensusBucketName
+
+  CensusDatabase:
+    Type: AWS::Glue::Database
+    Properties:
+      DatabaseInput:
+        Name: !Ref CensusDatabaseName
+        Description: "census dataset"
+      CatalogId: !Ref AWS::AccountId
+
+  CensusTable:
+    Type: AWS::Glue::Table
+    Properties:
+      DatabaseName: !Ref CensusDatabase
+      CatalogId: !Ref AWS::AccountId
+      TableInput:
+        Name: !Ref CensusTableName
+        TableType: EXTERNAL_TABLE
+        Parameters: { "classification" : "csv" }
+        StorageDescriptor:
+          Location:
+            Fn::Sub: "s3://${CensusBucketName}/"
+          InputFormat: "org.apache.hadoop.mapred.TextInputFormat"
+          OutputFormat: "org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat"
+          SerdeInfo:
+            Parameters: { "field.delim": ",", "serialization.format" : "," }
+            SerializationLibrary: "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe"
+          StoredAsSubDirectories: false
+          Columns:
+            - Name: CurStateCode
+              Type: string
+            - Name: CurCountyCode
+              Type: string
+            - Name: PrevStateCode
+              Type: string
+            - Name: PrevCountyCode
+              Type: string
+            - Name: CurStateName
+              Type: string
+            - Name: CurCountyName
+              Type: string
+            - Name: CurCountyPopulation
+              Type: float
+            - Name: CurCountyPopulationMoe
+              Type: float
+            - Name: CurCountyNonmovers
+              Type: float
+            - Name: CurCountyNonmoversMoe
+              Type: float
+            - Name: CurCountyMoversInUS
+              Type: float
+            - Name: CurCountyMoversInUSMoe
+              Type: float
+            - Name: CurCountyMoversInCounty
+              Type: float
+            - Name: CurCountyMoversInCountyMoe
+              Type: float
+            - Name: CurCountyMoversFromCounty
+              Type: float
+            - Name: CurCountyMoversFromCountyMoe
+              Type: float
+            - Name: CurCountyMoversFromState
+              Type: float
+            - Name: CurCountyMoversFromStateMoe
+              Type: float
+            - Name: CurCountyMoversFromAbroad
+              Type: float
+            - Name: CurCountyMoversFromAbroadMoe
+              Type: float
+            - Name: PrevStateName
+              Type: string
+            - Name: PrevCountyName
+              Type: string
+            - Name: PrevCountyPopulation
+              Type: float
+            - Name: PrevCountyPopulationMoe
+              Type: float
+            - Name: PrevCountyNonmovers
+              Type: float
+            - Name: PrevCountyNonmoversMoe
+              Type: float
+            - Name: PrevCountyMoversInUS
+              Type: float
+            - Name: PrevCountyMoversInUSMoe
+              Type: float
+            - Name: PrevCountyMoversInCounty
+              Type: float
+            - Name: PrevCountyMoversInCountyMoe
+              Type: float
+            - Name: PrevCountyMoversToCounty
+              Type: float
+            - Name: PrevCountyMoversToCountyMoe
+              Type: float
+            - Name: PrevCountyMoversToState
+              Type: float
+            - Name: PrevCountyMoversToStateMoe
+              Type: float
+            - Name: PrevCountyMoversToPR
+              Type: float
+            - Name: PrevCountyMoversToPRMoe
+              Type: float
+            - Name: CountyMovers
+              Type: float
+            - Name: CountyMoversMoe
+              Type: float
+
+Outputs:
+  AccessKey:
+    Value: !Ref CensusUser
+    Description: AWSAccessKeyId of census user
+  SecretKey:
+    Value: !GetAtt [CensusUserKey, SecretAccessKey]
+    Description: AWSSecretAccessKey of census user
