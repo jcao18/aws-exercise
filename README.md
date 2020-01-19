@@ -3,11 +3,12 @@
 EC2, S3 and Athena are used for this exercise. An EC2 instance is used to run the python script to download the dataset, convert the dataset into csv format and upload the converted dataset to a S3 bucket. A database and table are created in Athena to allow for query and data aggregation. The EC2 instance is optional. The python script can be run on an on-premise PC. 
 
 census_resources.yaml is the CloudFormation template used for the deployment. It creates the following resources:
-    EC2 instance
-    IAM user and IAM access key (for the python script to upload the dataset with AWS API)
-    IAM policy (to allow the user access to the S3 bucket)
-    S3 bucket
-    Glue database and table
+
+    * EC2 instance
+    * IAM user and IAM access key (for the python script to upload the dataset with AWS API)
+    * IAM policy (to allow the user access to the S3 bucket)
+    * S3 bucket
+    * Glue database and table
     
 census_processor.py is a simple python script that does the download, convertion and upload. It is run after the resources are deployed via the CloudFormation template. 
 
@@ -23,14 +24,14 @@ I would propose deploying Neo4j on EC2 to build a graph of data. Neo4j is open-s
 
 For the census migration data, I would design the graph model as follows, 
 
-  Node: State
-    Property: name, code
-  Node: County
-    Property: name, code, migration population
-  Relationship: Is part of
-    between State and County
-  Relationship: Move
-    between County and County
-    Property: direction, number of mover
+  * Node: State
+    * Property: name, code
+  * Node: County
+    * Property: name, code, migration population
+  * Relationship: Is part of
+    * between State and County
+  * Relationship: Move
+    * between County and County
+    * Property: direction, number of mover
     
 The cypher query language (LOAD CSV command) is used to load data into Neo4j. 'State' nodes are created by extracting state name and code from the dataset. 'County' nodes are created by extracting county name and code and all the migration population data from the dataset. Relationships 'Is part of' are created by extracting rows from the dataset and matching them against the newly created 'State' nodes and 'County' nodes. Similarly, 'Move' relationships are created by extracting rows from the dataset and matching them against the newly created 'County' nodes.
