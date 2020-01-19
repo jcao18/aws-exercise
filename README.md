@@ -15,7 +15,9 @@ EC2, S3 and Athena are used for this exercise. An EC2 instance is used to run th
 Query can be run from the Athena console or through AWS CLI from the EC2 instance.
 
 As for cost, the dataset is less than 80MB, it costs $0.03 per month to host it in a S3 bucket. The cost of the Athena is based on number of queries and calculated as follows,
+
     (number of queries per month) x (dataset size in TB) x $5 USD
+  
 For a 80MB dataset, it costs $0.38 per month for 1000 queries. Since the EC2 instance is optional, its cost is not calculated.
 
 # Exercise #2
