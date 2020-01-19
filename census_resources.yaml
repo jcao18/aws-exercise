@@ -13,7 +13,7 @@ Parameters:
     Default: census-user-policy
   CensusBucketName:
     Type: String
-    Default: aws-exercise-jpmci
+    Default: aws-exercise-census
   CensusDatabaseName:
     Type: String
     Default: censusdb
