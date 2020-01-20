@@ -14,6 +14,14 @@ EC2, S3 and Athena are used for this exercise. An EC2 instance is used to run th
 
 Query can be run from the Athena console or through AWS CLI from the EC2 instance.
 
+To find out how many people moved from New Hampshire to the Middlesex County of Massachusetts, I ran the following query,
+
+    SELECT sum(countymovers)
+    FROM "censusdb"."censusdb_migration" 
+    where curstatename='"Massachusetts"' and curcountyname='"Middlesex County"' and prevstatename='"New Hampshire"';
+
+The result is 3833.
+
 As for cost, the dataset is less than 80MB, it costs $0.03 per month to host it in a S3 bucket. The cost of the Athena is based on number of queries and calculated as follows,
 
     (number of queries per month) x (dataset size in TB) x $5 USD
